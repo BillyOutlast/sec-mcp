@@ -24,7 +24,7 @@ if [ -n "$stale_containers" ]; then
 fi
 
 echo "[bootstrap] Starting stack with Podman Compose..."
-podman compose up -d --build
+podman compose up --build
 
 echo "[bootstrap] Done."
 echo "  Open WebUI: http://localhost:3000"
