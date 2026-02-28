@@ -24,9 +24,9 @@ if [ -n "$stale_containers" ]; then
 fi
 
 echo "[bootstrap] Starting stack with Podman Compose..."
-podman compose up -d --build
+podman compose up --build
 
 echo "[bootstrap] Done."
-echo "  Open WebUI: http://localhost:3000"
+echo "  Open WebUI: http://localhost:3030"
 echo "  MCPO docs:  http://localhost:8000/docs"
 echo "  Ollama API: http://localhost:11434"
