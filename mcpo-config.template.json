@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "triv3-kali-server": {
+      "command": "python",
+      "args": [
+        "/opt/mcps/MCP-Kali-Server/mcp-server/mcp_server.py",
+        "--server",
+        "http://triv3-kali-api:5000"
+      ],
+      "env": {
+        "KALI_SERVER_URL": "http://triv3-kali-api:5000"
+      }
+    },
+    "k3nn3dy-kali-mcp": {
+      "type": "sse",
+      "url": "http://kali-mcp-sse:8000/sse"
+    },
+    "metasploit-mcp": {
+      "type": "sse",
+      "url": "http://metasploit-mcp:8085/sse"
+    },
+    "mcp-zap-server": {
+      "type": "streamable-http",
+      "url": "http://mcp-zap-server:7456/mcp",
+      "headers": {
+        "X-API-Key": "${MCP_ZAP_API_KEY}"
+      }
+    },
+    "nvd-cve-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "nvd-cve-mcp-server"
+      ]
+    },
+    "markdownify-mcp": {
+      "command": "node",
+      "args": [
+        "/opt/mcps/markdownify-mcp/dist/index.js"
+      ],
+      "env": {
+        "UV_PATH": "/bin/uv",
+        "MD_SHARE_DIR": "${MD_SHARE_DIR}"
+      }
+    }
+  }
+}
