@@ -70,17 +70,31 @@ Edit `/etc/pve/lxc/<CTID>.conf` on the Proxmox host and add:
 
 ```ini
 features: nesting=1,keyctl=1
-lxc.apparmor.profile: unconfined
+lxc.cgroup2.devices.allow: c 10:200 rwm
 lxc.cgroup2.devices.allow: c 226:* rwm
 lxc.cgroup2.devices.allow: c 235:* rwm
+lxc.mount.entry: /dev/net dev/net none bind,optional,create=dir
 lxc.mount.entry: /dev/dri dev/dri none bind,optional,create=dir
 lxc.mount.entry: /dev/kfd dev/kfd none bind,optional,create=file
 ```
+
+Important:
+
+- Do **not** set `lxc.apparmor.profile: unconfined` unless you explicitly need it.
+- If you already set it and see startup errors like `Failed to run autodev hooks` / `status 17`, remove that line first.
 
 Then restart the container:
 
 ```bash
 pct restart <CTID>
+```
+
+If startup still fails, stop the CT and test with this minimal reset:
+
+```bash
+pct stop <CTID>
+# edit /etc/pve/lxc/<CTID>.conf and remove: lxc.apparmor.profile: unconfined
+pct start <CTID>
 ```
 
 ### C. Validate inside the LXC container
