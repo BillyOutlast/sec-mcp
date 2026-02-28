@@ -2,6 +2,8 @@
 
 Security-focused MCP stack routed through `mcpo`, with Open WebUI + Ollama included.
 
+This stack is **ROCm-only** for Ollama.
+
 ## Included MCP servers
 
 - `triv3/mcp-kali-server`
@@ -13,12 +15,21 @@ Security-focused MCP stack routed through `mcpo`, with Open WebUI + Ollama inclu
 
 ## Files
 
-- `docker-compose.yml` - AMD ROCm override for Ollama
+- `docker-compose.yml` - Main stack (Ollama runs with ROCm)
 - `mcpo-config.template.json` - Templated `mcpo` multi-server config
 - `.env.example` - Environment variable template
 - `OPENWEBUI_MCP_SETUP.md` - Step-by-step MCP setup inside Open WebUI
 
 ## Quick start
+
+Prerequisites for Ollama on ROCm hosts:
+
+- Linux host with ROCm-compatible AMD GPU
+- Device access available for `/dev/kfd` and `/dev/dri`
+
+Running in Proxmox LXC?
+
+- Follow the dedicated LXC section in `OPENWEBUI_MCP_SETUP.md` before launching (includes known caveats and quick fixes).
 
 1. Create env file:
 
@@ -37,14 +48,6 @@ docker compose up -d --build
 - Open WebUI: `http://localhost:3000`
 - MCPO docs: `http://localhost:8000/docs`
 - Ollama API: `http://localhost:11434`
-
-## AMD GPU (Ollama ROCm)
-
-Use this only on Linux hosts with `/dev/kfd` and `/dev/dri` available:
-
-```powershell
-docker compose -f docker-compose.yml -f docker-compose.ollama-amd.yml up -d --build
-```
 
 ## MCPO routes
 
@@ -69,6 +72,7 @@ This includes:
 - Correct internal Docker URL usage (`http://mcpo:8000/...`)
 - Auth header guidance for `MCPO_API_KEY`
 - Validation and troubleshooting steps
+- A first-success test flow (section 6) to quickly verify MCP tool calls end-to-end
 
 ## Notes
 
