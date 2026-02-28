@@ -22,8 +22,7 @@ services:
   triv3-kali-api:
     image: python:3.12-slim
     depends_on:
-      init-mcps:
-        condition: service_completed_successfully
+      - init-mcps
     command: >-
       sh -lc "
       python -m pip install --no-cache-dir -r /opt/mcps/MCP-Kali-Server/requirements.kali.txt &&
@@ -36,7 +35,7 @@ services:
 
   kali-mcp-sse:
     build:
-      context: https://github.com/k3nn3dy-ai/kali-mcp.git
+      context: ./kali-mcp
     command: ["python", "-m", "kali_mcp_server.server", "--transport", "sse", "--port", "8000"]
     expose:
       - "8000"
@@ -126,16 +125,11 @@ services:
   mcpo:
     image: ghcr.io/open-webui/mcpo:main
     depends_on:
-      init-mcps:
-        condition: service_completed_successfully
-      triv3-kali-api:
-        condition: service_started
-      kali-mcp-sse:
-        condition: service_started
-      metasploit-mcp:
-        condition: service_started
-      mcp-zap-server:
-        condition: service_started
+      - init-mcps
+      - triv3-kali-api
+      - kali-mcp-sse
+      - metasploit-mcp
+      - mcp-zap-server
     environment:
       - MCPO_API_KEY=${MCPO_API_KEY:-top-secret}
       - MCP_ZAP_API_KEY=${MCP_ZAP_API_KEY:-changeme-mcp-zap-api-key}

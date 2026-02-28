@@ -17,6 +17,12 @@ docker compose config
 docker compose up -d --build
 ```
 
+Before running compose, ensure local build context exists:
+
+```bash
+test -d ./kali-mcp || git clone https://github.com/k3nn3dy-ai/kali-mcp.git kali-mcp
+```
+
 Expected outcomes:
 
 - `/dev/kfd` and `/dev/dri` exist
