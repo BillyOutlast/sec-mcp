@@ -75,8 +75,9 @@ services:
       - MSF_SSL=false
     command: >-
       sh -lc "
-      apt-get update && apt-get install -y --no-install-recommends git &&
+      apt-get update && apt-get install -y --no-install-recommends git netcat-openbsd &&
       rm -rf /var/lib/apt/lists/* &&
+      until nc -z metasploit-rpc 55553; do echo 'waiting for metasploit-rpc:55553...'; sleep 2; done &&
       git clone https://github.com/GH05TCREW/MetasploitMCP.git /opt/MetasploitMCP &&
       python -m pip install --no-cache-dir -r /opt/MetasploitMCP/requirements.txt &&
       python /opt/MetasploitMCP/MetasploitMCP.py --transport http --host 0.0.0.0 --port 8085
@@ -105,6 +106,7 @@ services:
     environment:
       - MCP_SECURITY_MODE=api-key
       - MCP_API_KEY=${MCP_ZAP_API_KEY:-changeme-mcp-zap-api-key}
+      - ZAP_API_KEY=${ZAP_API_KEY:-changeme-zap-api-key}
       - ZAP_SERVER_URL=zap
       - ZAP_SERVER_PORT=8090
       - ZAP_SERVER_API_KEY=${ZAP_API_KEY:-changeme-zap-api-key}
