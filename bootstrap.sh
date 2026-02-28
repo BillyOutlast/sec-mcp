@@ -15,6 +15,14 @@ if [ ! -e "/dev/kfd" ] || [ ! -e "/dev/dri" ]; then
   exit 1
 fi
 
+echo "[bootstrap] Cleaning previous sec-mcp containers (if any)..."
+podman compose down --remove-orphans >/dev/null 2>&1 || true
+
+stale_containers=$(podman ps -a --format '{{.Names}}' | grep '^sec-mcp_' || true)
+if [ -n "$stale_containers" ]; then
+  echo "$stale_containers" | xargs -r podman rm -f >/dev/null
+fi
+
 echo "[bootstrap] Starting stack with Podman Compose..."
 podman compose up -d --build
 

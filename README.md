@@ -66,6 +66,7 @@ chmod +x ./bootstrap.sh
 ```
 
 The bootstrap script runs preflight checks for `/dev/net/tun`, `/dev/kfd`, and `/dev/dri` before starting Podman Compose.
+It also removes stale `sec-mcp_*` containers to avoid Podman name-collision errors on reruns.
 
 3. Open services:
 
