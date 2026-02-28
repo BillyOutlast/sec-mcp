@@ -3,11 +3,16 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-if [ ! -d "./kali-mcp/.git" ]; then
-  echo "[bootstrap] Cloning kali-mcp..."
-  git clone https://github.com/k3nn3dy-ai/kali-mcp.git kali-mcp
-else
-  echo "[bootstrap] kali-mcp already present."
+if [ ! -e "/dev/net/tun" ]; then
+  echo "[bootstrap] ERROR: /dev/net/tun is missing."
+  echo "[bootstrap] In Proxmox LXC, enable container networking features before Podman builds."
+  exit 1
+fi
+
+if [ ! -e "/dev/kfd" ] || [ ! -e "/dev/dri" ]; then
+  echo "[bootstrap] ERROR: ROCm devices are missing (/dev/kfd or /dev/dri)."
+  echo "[bootstrap] Apply Proxmox LXC passthrough settings from OPENWEBUI_MCP_SETUP.md and restart CT."
+  exit 1
 fi
 
 echo "[bootstrap] Starting stack with Podman Compose..."

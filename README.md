@@ -16,7 +16,6 @@ This stack is **ROCm-only** for Ollama.
 ## Files
 
 - `docker-compose.yml` - Main stack (Ollama runs with ROCm)
-- `kali-mcp/` - Local build context for `kali-mcp-sse` image
 - `mcpo-config.template.json` - Templated `mcpo` multi-server config
 - `.env.example` - Environment variable template
 - `OPENWEBUI_MCP_SETUP.md` - Step-by-step MCP setup inside Open WebUI
@@ -38,16 +37,17 @@ Running in Proxmox LXC?
 Copy-Item .env.example .env
 ```
 
-If `kali-mcp/` is missing, clone it first:
-
-```powershell
-git clone https://github.com/k3nn3dy-ai/kali-mcp.git kali-mcp
-```
-
 2. Start base stack:
 
 ```powershell
 docker compose up -d --build
+```
+
+Recommended for Podman/LXC first:
+
+```bash
+chmod +x ./preflight.sh
+./preflight.sh
 ```
 
 Podman users:
@@ -59,9 +59,13 @@ podman compose up -d --build
 Or use the bootstrap helper:
 
 ```bash
+chmod +x ./preflight.sh
+./preflight.sh
 chmod +x ./bootstrap.sh
 ./bootstrap.sh
 ```
+
+The bootstrap script runs preflight checks for `/dev/net/tun`, `/dev/kfd`, and `/dev/dri` before starting Podman Compose.
 
 3. Open services:
 

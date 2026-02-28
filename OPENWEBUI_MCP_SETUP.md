@@ -9,6 +9,15 @@ This stack exposes MCP servers through `mcpo` as OpenAPI endpoints.
 
 Run these in the target runtime environment (inside your LXC if using Proxmox):
 
+Preferred automated check:
+
+```bash
+chmod +x ./preflight.sh
+./preflight.sh
+```
+
+Equivalent manual checks:
+
 ```bash
 ls -l /dev/kfd
 ls -l /dev/dri
