@@ -1,8 +1,8 @@
 services:
   init-mcps:
     image: alpine/git:latest
+    entrypoint: ["/bin/sh", "-lc"]
     command: >-
-      sh -lc "
       set -e;
       mkdir -p /opt/mcps;
       if [ ! -d /opt/mcps/MCP-Kali-Server/.git ]; then
@@ -20,7 +20,6 @@ services:
       else
         cd /opt/mcps/kali-mcp && git pull --ff-only;
       fi
-      "
     volumes:
       - mcp_sources:/opt/mcps
 
@@ -53,11 +52,13 @@ services:
       - "8000"
 
   metasploit-rpc:
-    image: metasploitframework/metasploit-framework:latest
+    image: kalilinux/kali-rolling:latest
     environment:
       - MSF_PASSWORD=${MSF_PASSWORD:-changeme}
     command: >-
       sh -lc "
+      apt-get update && apt-get install -y --no-install-recommends metasploit-framework &&
+      rm -rf /var/lib/apt/lists/* &&
       msfrpcd -P ${MSF_PASSWORD:-changeme} -S -a 0.0.0.0 -p 55553 -f
       "
     expose:
@@ -89,7 +90,7 @@ services:
       - ZAP_API_KEY=${ZAP_API_KEY:-changeme-zap-api-key}
     command: >-
       sh -lc "
-      zap.sh -daemon -host 0.0.0.0 -port 8090
+      /zap/zap.sh -daemon -host 0.0.0.0 -port 8090
       -config api.addrs.addr.name=.*
       -config api.addrs.addr.regex=true
       -config api.key=${ZAP_API_KEY:-changeme-zap-api-key}
@@ -132,7 +133,7 @@ services:
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
     ports:
-      - "3030:8080"
+      - "3000:8080"
     volumes:
       - open_webui_data:/app/backend/data
     restart: unless-stopped
