@@ -82,6 +82,25 @@ if [ -d /dev/dri ]; then
   ls -l /dev/dri || true
 fi
 
+section "Host kernel log analysis"
+if command -v dmesg >/dev/null 2>&1; then
+  dmesg_tail="$(dmesg 2>/dev/null | grep -Ei 'amdgpu|kfd|drm|gfx|mes' | tail -n 200 || true)"
+
+  if [ -z "$dmesg_tail" ]; then
+    warn "No recent amdgpu/kfd/drm lines found in dmesg"
+  else
+    info "Recent amdgpu/kfd/drm lines detected"
+  fi
+
+  if echo "$dmesg_tail" | grep -Eqi 'MES failed to respond|GPU reset begin|device lost from bus|ASIC reset failed|Failed to quiesce KFD|evicting device resources failed|failed to suspend gangs'; then
+    fail "Host dmesg shows critical AMDGPU/KFD instability (GPU reset or queue failures)"
+    echo "      This is a host-side driver/runtime issue and will force Ollama CPU fallback."
+    has_fail=1
+  fi
+else
+  warn "dmesg command unavailable; skipping kernel log analysis"
+fi
+
 section "Container checks"
 
 if ! podman info >/dev/null 2>&1; then
