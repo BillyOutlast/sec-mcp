@@ -104,12 +104,23 @@ services:
     image: zaproxy/zap-stable:latest
     environment:
       - ZAP_API_KEY=${ZAP_API_KEY:-changeme-zap-api-key}
+      - ZAP_SAFE_MODE=${ZAP_SAFE_MODE:-true}
+      - ZAP_ASCAN_THREAD_PER_HOST=${ZAP_ASCAN_THREAD_PER_HOST:-2}
+      - ZAP_SPIDER_THREADS=${ZAP_SPIDER_THREADS:-2}
+      - ZAP_DISABLED_SCANNERS=${ZAP_DISABLED_SCANNERS:-40026}
     command: >-
       sh -lc "
-      /zap/zap.sh -daemon -host 0.0.0.0 -port 8090
-      -config api.addrs.addr.name=.*
-      -config api.addrs.addr.regex=true
-      -config api.key=${ZAP_API_KEY:-changeme-zap-api-key}
+      EXTRA_OPTS='';
+      if [ \"${ZAP_SAFE_MODE:-true}\" = \"true\" ]; then
+        EXTRA_OPTS=\"$EXTRA_OPTS -config ascan.threadPerHost=${ZAP_ASCAN_THREAD_PER_HOST:-2}\";
+        EXTRA_OPTS=\"$EXTRA_OPTS -config spider.thread=${ZAP_SPIDER_THREADS:-2}\";
+        EXTRA_OPTS=\"$EXTRA_OPTS -config ascan.disabledScanners=${ZAP_DISABLED_SCANNERS:-40026}\";
+      fi;
+      eval /zap/zap.sh -daemon -host 0.0.0.0 -port 8090 \
+      -config api.addrs.addr.name=.* \
+      -config api.addrs.addr.regex=true \
+      -config api.key=${ZAP_API_KEY:-changeme-zap-api-key} \
+      $EXTRA_OPTS
       "
     expose:
       - "8090"

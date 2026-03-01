@@ -62,6 +62,17 @@ ZAP_API_KEY=<paste-generated-zap-key>
 MCP_ZAP_API_KEY=<paste-generated-mcp-zap-key>
 ```
 
+Optional (recommended) safer ZAP defaults in `.env`:
+
+```dotenv
+ZAP_SAFE_MODE=true
+ZAP_ASCAN_THREAD_PER_HOST=2
+ZAP_SPIDER_THREADS=2
+ZAP_DISABLED_SCANNERS=40026
+```
+
+This reduces noisy/aggressive behavior (especially browser/DOM-XSS related scan noise). Set `ZAP_SAFE_MODE=false` to restore default ZAP behavior.
+
 2. Start base stack:
 
 ```powershell
@@ -142,6 +153,7 @@ Important compatibility note:
 
 - First startup is slower because dependencies are built/installed.
 - `kali-mcp-sse` and `triv3-kali-api` install web audit binaries on startup (`nikto`, `gobuster`, `sqlmap`, `dirb`, `seclists`), so first boot can take several extra minutes.
+- `zap` runs in a safer default profile when `ZAP_SAFE_MODE=true`.
 - `markdownify-mcp` is built at `mcpo` container startup.
 - `mcp-zap-server` auth values are injected via `.env` into `mcpo-config.template.json` at runtime.
 - `MD_SHARE_DIR` controls markdown file access scope for `markdownify-mcp`.
