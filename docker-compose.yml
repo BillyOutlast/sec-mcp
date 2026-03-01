@@ -34,6 +34,11 @@ services:
       - init-mcps
     command: >-
       sh -lc "
+      apt-get update && apt-get install -y --no-install-recommends nikto gobuster sqlmap dirb seclists curl ca-certificates &&
+      rm -rf /var/lib/apt/lists/* &&
+      mkdir -p /usr/share/wordlists/dirb /usr/share/wordlists &&
+      [ -f /usr/share/dirb/wordlists/common.txt ] && ln -sf /usr/share/dirb/wordlists/common.txt /usr/share/wordlists/dirb/common.txt || true &&
+      [ -d /usr/share/seclists ] && ln -sfn /usr/share/seclists /usr/share/wordlists/SecLists || true &&
       python -m pip install --no-cache-dir -r /opt/mcps/MCP-Kali-Server/requirements.kali.txt &&
       python /opt/mcps/MCP-Kali-Server/kali-server/kali_server.py --port 5000
       "
