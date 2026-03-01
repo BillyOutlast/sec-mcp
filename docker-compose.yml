@@ -120,6 +120,13 @@ services:
 
   ollama:
     image: ollama/ollama:rocm
+    user: "0:0"
+    privileged: true
+    group_add:
+      - "44"
+      - "992"
+    environment:
+      - OLLAMA_LLM_LIBRARY=rocm
     ports:
       - "11434:11434"
     volumes:
