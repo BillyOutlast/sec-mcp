@@ -120,10 +120,6 @@ services:
 
   ollama:
     image: ollama/ollama:rocm
-    user: "0:0"
-    group_add:
-      - "44"
-      - "992"
     devices:
       - /dev/kfd
       - /dev/dri
