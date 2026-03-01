@@ -121,11 +121,8 @@ services:
   ollama:
     image: ollama/ollama:rocm
     devices:
-      - /dev/kfd
-      - /dev/dri/renderD128
-      - /dev/dri/renderD129
-      - /dev/dri/card1
-      - /dev/dri/card2
+       - "/dev/kfd:/dev/kfd"
+       - "/dev/dri:/dev/dri"
     ports:
       - "11434:11434"
     volumes:
