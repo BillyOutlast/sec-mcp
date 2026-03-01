@@ -1,27 +1,32 @@
 services:
   init-mcps:
-    image: alpine/git:latest
-    entrypoint: ["/bin/sh", "-lc"]
+    image: alpine:3.20
     command: >-
+      sh -lc '
       set -e;
+      apk add --no-cache git ca-certificates;
       mkdir -p /opt/mcps;
       if [ ! -d /opt/mcps/MCP-Kali-Server/.git ]; then
         git clone https://github.com/triv3/mcp-kali-server.git /opt/mcps/MCP-Kali-Server;
       else
         cd /opt/mcps/MCP-Kali-Server && git pull --ff-only;
-      fi
+      fi;
       if [ ! -d /opt/mcps/markdownify-mcp/.git ]; then
         git clone https://github.com/zcaceres/markdownify-mcp.git /opt/mcps/markdownify-mcp;
       else
         cd /opt/mcps/markdownify-mcp && git pull --ff-only;
-      fi
+      fi;
       if [ ! -d /opt/mcps/kali-mcp/.git ]; then
         git clone https://github.com/k3nn3dy-ai/kali-mcp.git /opt/mcps/kali-mcp;
       else
         cd /opt/mcps/kali-mcp && git pull --ff-only;
-      fi
+      fi;
+      touch /opt/mcps/.init_done;
+      tail -f /dev/null
+      '
     volumes:
       - mcp_sources:/opt/mcps
+    restart: unless-stopped
 
   triv3-kali-api:
     image: python:3.12-slim
