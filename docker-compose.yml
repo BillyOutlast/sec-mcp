@@ -129,7 +129,8 @@ services:
       - OLLAMA_LLM_LIBRARY=rocm
     devices:
       - /dev/kfd
-      - /dev/dri
+      - /dev/dri/card1
+      - /dev/dri/renderD128
     ports:
       - "11434:11434"
     volumes:
