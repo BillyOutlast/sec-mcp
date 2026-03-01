@@ -90,6 +90,15 @@ chmod +x ./bootstrap.sh
 ./bootstrap.sh
 ```
 
+GPU diagnosis helper (ROCm/Ollama):
+
+```bash
+chmod +x ./gpu-diagnose.sh
+./gpu-diagnose.sh
+```
+
+The script checks host device visibility, container device access, and Ollama log signals (GPU offload vs CPU fallback).
+
 The bootstrap script runs preflight checks for `/dev/net/tun`, `/dev/kfd`, and `/dev/dri` before starting Podman Compose.
 It also removes stale `sec-mcp_*` containers to avoid Podman name-collision errors on reruns.
 

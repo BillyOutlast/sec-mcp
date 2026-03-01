@@ -127,11 +127,12 @@ services:
       - "992"
     environment:
       - OLLAMA_LLM_LIBRARY=rocm
+    devices:
+      - /dev/kfd
+      - /dev/dri
     ports:
       - "11434:11434"
     volumes:
-      - /dev/kfd:/dev/kfd
-      - /dev/dri:/dev/dri
       - ollama_data:/root/.ollama
     restart: unless-stopped
 
