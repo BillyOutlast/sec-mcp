@@ -139,6 +139,26 @@ After device and Docker validation succeed, continue with step 1 below.
 
 This deployment assumes a ROCm-capable Linux host for Ollama (`/dev/kfd` and `/dev/dri`).
 
+Before starting, generate strong values for `ZAP_API_KEY` and `MCP_ZAP_API_KEY` in `.env`.
+
+PowerShell:
+
+```powershell
+$zapKey = -join ((48..57 + 65..90 + 97..122) | Get-Random -Count 48 | ForEach-Object {[char]$_})
+$mcpZapKey = -join ((48..57 + 65..90 + 97..122) | Get-Random -Count 48 | ForEach-Object {[char]$_})
+Write-Host "ZAP_API_KEY=$zapKey"
+Write-Host "MCP_ZAP_API_KEY=$mcpZapKey"
+```
+
+Linux/macOS shell:
+
+```bash
+echo "ZAP_API_KEY=$(openssl rand -hex 24)"
+echo "MCP_ZAP_API_KEY=$(openssl rand -hex 24)"
+```
+
+Set those values in your `.env` file and keep them identical to what your running stack uses.
+
 ```powershell
 docker compose up -d --build
 ```

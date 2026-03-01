@@ -37,6 +37,31 @@ Running in Proxmox LXC?
 Copy-Item .env.example .env
 ```
 
+Generate strong API keys for ZAP + MCP-ZAP and set them in `.env`:
+
+PowerShell:
+
+```powershell
+$zapKey = -join ((48..57 + 65..90 + 97..122) | Get-Random -Count 48 | ForEach-Object {[char]$_})
+$mcpZapKey = -join ((48..57 + 65..90 + 97..122) | Get-Random -Count 48 | ForEach-Object {[char]$_})
+Write-Host "ZAP_API_KEY=$zapKey"
+Write-Host "MCP_ZAP_API_KEY=$mcpZapKey"
+```
+
+Linux/macOS shell:
+
+```bash
+echo "ZAP_API_KEY=$(openssl rand -hex 24)"
+echo "MCP_ZAP_API_KEY=$(openssl rand -hex 24)"
+```
+
+Then copy those values into `.env`:
+
+```dotenv
+ZAP_API_KEY=<paste-generated-zap-key>
+MCP_ZAP_API_KEY=<paste-generated-mcp-zap-key>
+```
+
 2. Start base stack:
 
 ```powershell
