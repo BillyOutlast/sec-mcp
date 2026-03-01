@@ -147,7 +147,21 @@ services:
 
   mcpo:
     image: ghcr.io/open-webui/mcpo:main
-    entrypoint: ["/bin/sh", "-lc"]
+    entrypoint:
+      - /bin/sh
+      - -lc
+      - >-
+        apt-get update && apt-get install -y --no-install-recommends gettext-base python3 python3-pip curl bash &&
+        rm -rf /var/lib/apt/lists/* &&
+        python -m pip install --no-cache-dir -r /opt/mcps/MCP-Kali-Server/requirements.mcp.txt &&
+        mkdir -p ${MD_SHARE_DIR:-/opt/mcps/shared-markdown} &&
+        cd /opt/mcps/markdownify-mcp &&
+        rm -f .python-version &&
+        corepack enable &&
+        pnpm install &&
+        pnpm run build &&
+        envsubst < /config/mcpo-config.template.json > /tmp/mcpo-config.json &&
+        mcpo --host 0.0.0.0 --port 8000 --api-key "${MCPO_API_KEY:-top-secret}" --config /tmp/mcpo-config.json
     depends_on:
       - init-mcps
       - triv3-kali-api
@@ -158,18 +172,6 @@ services:
       - MCPO_API_KEY=${MCPO_API_KEY:-top-secret}
       - MCP_ZAP_API_KEY=${MCP_ZAP_API_KEY:-changeme-mcp-zap-api-key}
       - MD_SHARE_DIR=${MD_SHARE_DIR:-/opt/mcps/shared-markdown}
-    command: >-
-      apt-get update && apt-get install -y --no-install-recommends gettext-base python3 python3-pip curl bash &&
-      rm -rf /var/lib/apt/lists/* &&
-      python -m pip install --no-cache-dir -r /opt/mcps/MCP-Kali-Server/requirements.mcp.txt &&
-      mkdir -p ${MD_SHARE_DIR:-/opt/mcps/shared-markdown} &&
-      cd /opt/mcps/markdownify-mcp &&
-      rm -f .python-version &&
-      corepack enable &&
-      pnpm install &&
-      pnpm run build &&
-      envsubst < /config/mcpo-config.template.json > /tmp/mcpo-config.json &&
-      mcpo --host 0.0.0.0 --port 8000 --api-key \"${MCPO_API_KEY:-top-secret}\" --config /tmp/mcpo-config.json
     volumes:
       - ./mcpo-config.template.json:/config/mcpo-config.template.json:ro
       - mcp_sources:/opt/mcps
