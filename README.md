@@ -141,6 +141,7 @@ Important compatibility note:
 ## Notes
 
 - First startup is slower because dependencies are built/installed.
+- `kali-mcp-sse` installs web audit binaries on startup (`nikto`, `gobuster`, `sqlmap`, `dirb`, `seclists`), so first boot can take several extra minutes.
 - `markdownify-mcp` is built at `mcpo` container startup.
 - `mcp-zap-server` auth values are injected via `.env` into `mcpo-config.template.json` at runtime.
 - `MD_SHARE_DIR` controls markdown file access scope for `markdownify-mcp`.
