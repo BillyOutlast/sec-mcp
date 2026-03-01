@@ -5,6 +5,8 @@ This stack exposes MCP servers through `mcpo` as OpenAPI endpoints.
 - `mcpo` URL from host: `http://localhost:8000`
 - `mcpo` URL from inside Docker network (Open WebUI): `http://mcpo:8000`
 
+If tool calls return 404 from `mcpo` root paths, jump to **Re-import checklist (fix 404 on tool calls)** in section 3.
+
 ## Preflight checklist (run before first launch)
 
 Run these in the target runtime environment (inside your LXC if using Proxmox):
@@ -174,22 +176,54 @@ In Open WebUI, navigate to the OpenAPI server management screen (label can vary 
 
 Add one OpenAPI server per MCP route from `mcpo`.
 
+Important for some Open WebUI versions:
+
+- OpenAPI import may ignore relative `servers` entries (for example `"servers": [{"url": "/markdownify-mcp"}]`).
+- If that happens, Open WebUI calls tool paths at `http://mcpo:8000/<tool>` instead of `http://mcpo:8000/<server>/<tool>`, causing HTTP 404.
+- In each imported OpenAPI server entry, set/override the base URL to include the server prefix (examples below).
+
 Suggested entries:
 
 - Name: `triv3-kali-server`
   - OpenAPI URL: `http://mcpo:8000/triv3-kali-server/openapi.json`
+  - Base URL override: `http://mcpo:8000/triv3-kali-server`
 - Name: `k3nn3dy-kali-mcp`
   - OpenAPI URL: `http://mcpo:8000/k3nn3dy-kali-mcp/openapi.json`
+  - Base URL override: `http://mcpo:8000/k3nn3dy-kali-mcp`
 - Name: `metasploit-mcp`
   - OpenAPI URL: `http://mcpo:8000/metasploit-mcp/openapi.json`
+  - Base URL override: `http://mcpo:8000/metasploit-mcp`
 - Name: `mcp-zap-server`
   - OpenAPI URL: `http://mcpo:8000/mcp-zap-server/openapi.json`
+  - Base URL override: `http://mcpo:8000/mcp-zap-server`
 - Name: `nvd-cve-mcp-server`
   - OpenAPI URL: `http://mcpo:8000/nvd-cve-mcp-server/openapi.json`
+  - Base URL override: `http://mcpo:8000/nvd-cve-mcp-server`
 - Name: `markdownify-mcp`
   - OpenAPI URL: `http://mcpo:8000/markdownify-mcp/openapi.json`
+  - Base URL override: `http://mcpo:8000/markdownify-mcp`
 
 If your Open WebUI is outside Docker, use `http://localhost:8000/.../openapi.json` instead.
+
+If a base URL override field is available, use `http://localhost:8000/<server-name>` for host-based Open WebUI.
+
+### Re-import checklist (fix 404 on tool calls)
+
+Use this exact flow when Open WebUI shows errors like `404 Not Found` on root routes such as `/webpage-to-markdown`, `/fetch`, `/run`, or `/command`.
+
+1. In Open WebUI, open OpenAPI server management.
+2. Delete the existing imported MCP server entry that is failing.
+3. Re-add it with:
+  - OpenAPI URL: `http://mcpo:8000/<server-name>/openapi.json` (or host equivalent)
+  - Base URL override: `http://mcpo:8000/<server-name>` (or host equivalent)
+4. Re-apply auth header for `MCPO_API_KEY` if prompted.
+5. Save, then run one simple test tool call for that server.
+6. Repeat for any other MCP server still returning root-path 404s.
+
+Quick verification from the host:
+
+- `http://localhost:8000/<server-name>/docs` opens.
+- Tool calls from Open WebUI no longer hit root paths (`/tool-name`) on `mcpo`.
 
 ## 4) Authentication (if enabled)
 
@@ -271,6 +305,7 @@ Expected result:
 | Symptom | Likely cause | Fast fix |
 |---|---|---|
 | Open WebUI fails to import OpenAPI URL | Wrong base URL for deployment context | Use `http://mcpo:8000/...` when Open WebUI is in Docker, `http://localhost:8000/...` when outside |
+| Tool call returns 404 from mcpo root (for example `/webpage-to-markdown`, `/fetch`, `/run`, `/command`) | Open WebUI ignored relative OpenAPI `servers` value and dropped server prefix | Set Base URL override to `http://mcpo:8000/<server-name>` (or host equivalent), then re-import/re-save OpenAPI server |
 | OpenAPI import succeeds but tools fail at call time | Missing/incorrect mcpo auth header | Add `Authorization: Bearer <MCPO_API_KEY>` (or `X-API-Key`) in OpenAPI server settings |
 | `mcp-zap-server` tools return auth errors | `MCP_ZAP_API_KEY`/`ZAP_API_KEY` mismatch | Recheck `.env`, restart stack, confirm rendered config in mcpo logs |
 | No tools visible for one server route | Upstream MCP server failed to start | `docker compose logs -f <service>` and fix startup error first |

@@ -124,6 +124,11 @@ This includes:
 - Validation and troubleshooting steps
 - A first-success test flow (section 6) to quickly verify MCP tool calls end-to-end
 
+Important compatibility note:
+
+- Some Open WebUI versions ignore relative OpenAPI `servers` values.
+- If tools return 404 on root routes (for example `/webpage-to-markdown`, `/fetch`, `/run`, `/command`), set each imported server Base URL to `http://mcpo:8000/<server-name>` and re-save/re-import.
+
 ## Notes
 
 - First startup is slower because dependencies are built/installed.
